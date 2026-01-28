@@ -1,0 +1,87 @@
+# Blender 5.0.1 MTL File: 'cas (1).blend'
+# www.blender.org
+
+newmtl Dress
+Ns 6.941372
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Dress_baseColor.png
+map_Bump -bm 1.000000 textures/Dress_normal.png
+
+newmtl Flower
+Ns 702.267639
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Flower_baseColor.png
+
+newmtl Hair
+Ns 0.000338
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd textures/Hair_baseColor.png
+map_d textures/Hair_baseColor.png
+map_Bump -bm 1.000000 textures/Hair_normal.png
+
+newmtl Hands
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd textures/Hands_baseColor.png
+
+newmtl Head
+Ns 6.941372
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Head_baseColor.png
+map_Bump -bm 1.000000 textures/Head_normal.png
+
+newmtl Sleeve
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Sleeve_baseColor.png
+map_Bump -bm 1.000000 textures/Dress_normal.png
+
+newmtl Teeth
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd textures/Teeth_baseColor.png
+
+newmtl Torso
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textures/Hands_baseColor.png
+map_Bump -bm 1.000000 textures/Head_normal.png
