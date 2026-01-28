@@ -13,7 +13,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <learnopengl/stb_image.h>
 
-// --- CONFIGURACI”N ---
+// --- CONFIGURACI√ìN ---
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 800;
 const int MAX_LIGHTS = 32;
@@ -37,7 +37,7 @@ struct DroneState {
     float batteryPercent = 100.0f;
 } drone;
 
-Camera camera(glm::vec3(0.0f, 2.0f, 15.0f));
+Camera camera(glm::vec3(-4.2f, 2.0f, 35.0f));
 const glm::vec3 SPAWN_POINT = glm::vec3(0.0f, 2.0f, 15.0f);
 float lastX = SCR_WIDTH / 2.0f, lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -132,12 +132,22 @@ unsigned int loadTexture(const char* path) {
 
     int width, height, nrChannels;
     unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
+
     if (data) {
-        GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+        GLenum format;
+        if (nrChannels == 1)
+            format = GL_RED;
+        else if (nrChannels == 3)
+            format = GL_RGB;
+        else if (nrChannels == 4)
+            format = GL_RGBA; // <--- ¬°Esto es lo que necesitabas!
+
         glBindTexture(GL_TEXTURE_2D, textureID);
+        // Enviamos la textura a OpenGL con el formato correcto detectado arriba
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
+        // Par√°metros de texturas
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -239,8 +249,8 @@ unsigned int setupTextVAO() {
 }
 
 void createDigitVertices(std::vector<float>& v, int digit, float x, float y, float s) {
-    // Dibuja dÌgitos del 0-9 usando segmentos de 7 lÌneas
-    // Coordenadas ajustables: x (horizontal), y (vertical), s (tamaÒo)
+    // Dibuja d√≠gitos del 0-9 usando segmentos de 7 l√≠neas
+    // Coordenadas ajustables: x (horizontal), y (vertical), s (tama√±o)
     switch (digit) {
     case 0:
         v.insert(v.end(), { x,y,0, x,y + 2 * s,0, x,y + 2 * s,0, x + s,y + 2 * s,0, x + s,y + 2 * s,0, x + s,y,0, x + s,y,0, x,y,0 });
@@ -277,10 +287,10 @@ void createDigitVertices(std::vector<float>& v, int digit, float x, float y, flo
 
 unsigned int createTimerVAO(int hours, int mins, int secs) {
     std::vector<float> v;
-    // POSICI”N: Esquina inferior derecha
+    // POSICI√ìN: Esquina inferior derecha
     // Ajusta estas coordenadas para mover el timer:
-    float startX = 0.60f;   // M·s positivo = m·s a la derecha
-    float startY = -0.70f;  // M·s negativo = m·s abajo
+    float startX = 0.60f;   // M√°s positivo = m√°s a la derecha
+    float startY = -0.70f;  // M√°s negativo = m√°s abajo
     float digitSize = 0.012f;
     float spacing = 0.035f;
 
@@ -322,14 +332,14 @@ unsigned int createTimerVAO(int hours, int mins, int secs) {
 
 unsigned int createBatteryVAO(float percent) {
     std::vector<float> v;
-    // POSICI”N: Esquina superior izquierda
-    // Ajusta estas coordenadas para mover la baterÌa:
-    float x = -0.85f;  // M·s negativo = m·s a la izquierda
-    float y = 0.75f;   // M·s positivo = m·s arriba
-    float w = 0.08f;   // Ancho de la baterÌa
-    float h = 0.04f;   // Alto de la baterÌa
+    // POSICI√ìN: Esquina superior izquierda
+    // Ajusta estas coordenadas para mover la bater√≠a:
+    float x = -0.85f;  // M√°s negativo = m√°s a la izquierda
+    float y = 0.75f;   // M√°s positivo = m√°s arriba
+    float w = 0.08f;   // Ancho de la bater√≠a
+    float h = 0.04f;   // Alto de la bater√≠a
 
-    // Contorno de baterÌa
+    // Contorno de bater√≠a
     v.insert(v.end(), {
         x, y, 0, x + w, y, 0,
         x + w, y, 0, x + w, y - h, 0,
@@ -337,7 +347,7 @@ unsigned int createBatteryVAO(float percent) {
         x, y - h, 0, x, y, 0
         });
 
-    // Punta de baterÌa (derecha)
+    // Punta de bater√≠a (derecha)
     float tipW = 0.01f;
     v.insert(v.end(), {
         x + w, y - h * 0.3f, 0, x + w + tipW, y - h * 0.3f, 0,
@@ -345,7 +355,7 @@ unsigned int createBatteryVAO(float percent) {
         x + w + tipW, y - h * 0.7f, 0, x + w, y - h * 0.7f, 0
         });
 
-    // Relleno de baterÌa seg˙n porcentaje
+    // Relleno de bater√≠a seg√∫n porcentaje
     float fillW = (w - 0.008f) * (percent / 100.0f);
     if (fillW > 0.001f) {
         v.insert(v.end(), {
@@ -388,9 +398,13 @@ int main() {
 
     Shader lightingShader("shaders/lighting.vs", "shaders/lighting.fs");
 
-    Model house("C:/Users/angul/source/repos/OpenGl/OpenGl/model/scene2/Scnecp.obj");
-    Model clouds("C:/Users/angul/source/repos/OpenGl/OpenGl/model/scene2/Clouds.obj");
-    Model lightsModel("C:/Users/angul/source/repos/OpenGl/OpenGl/model/scene2/Lights.obj");
+    Model house("C:/Users/DELL/Documents/Visual Studio 2022/OpenGL/OpenGL/model/scene2/Scnecp.obj");
+    Model clouds("C:/Users/DELL/Documents/Visual Studio 2022/OpenGL/OpenGL/model/scene2/Clouds.obj");
+    Model lightsModel("C:/Users/DELL/Documents/Visual Studio 2022/OpenGL/OpenGL/model/scene2/Lights.obj");
+	Model moon("C:/Users/DELL/Documents/Visual Studio 2022/OpenGL/OpenGL/model/scene2/Moon.obj");
+    Model ghost1Model("C:/Users/DELL/Documents/Visual Studio 2022/OpenGL/OpenGL/model/scene2/Ghost1.obj");
+    Model ghost2Model("C:/Users/DELL/Documents/Visual Studio 2022/OpenGL/OpenGL/model/scene2/Ghost2.obj");
+    Model vanModel("C:/Users/DELL/Documents/Visual Studio 2022/OpenGL/OpenGL/model/scene2/van.obj");
 
     ExtractData(house, lightsModel);
 
@@ -451,7 +465,7 @@ int main() {
     unsigned int textVAO = setupTextVAO();
 
     // Cambia esta ruta a tu imagen PNG
-    unsigned int frameTexture = loadTexture("C:/Users/angul/source/repos/OpenGl/OpenGl/textures/marco.png");
+    unsigned int frameTexture = loadTexture("C:/Users/DELL/Documents/Visual Studio 2022/OpenGL/OpenGL/textures/marco.png");
 
     // Ubicaciones de uniforms
     std::vector<GLint> lightPosLocs(MAX_LIGHTS), lightColLocs(MAX_LIGHTS), lightIntLocs(MAX_LIGHTS);
@@ -472,6 +486,7 @@ int main() {
     float lastBatteryUpdate = 0.0f;
 
     while (!glfwWindowShouldClose(window)) {
+        // --- C√ÅLCULO DE TIEMPO ---
         float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -481,18 +496,18 @@ int main() {
             drone.startTime = currentFrame;
         }
 
-        // Actualizar baterÌa (pierde 1% cada 6 segundos = 100% dura 10 minutos)
+        // --- L√ìGICA DE JUEGO (BATER√çA Y TIMER) ---
+        // Actualizar bater√≠a
         if (currentFrame - lastBatteryUpdate > 6.0f) {
             drone.batteryPercent = std::max(0.0f, drone.batteryPercent - 1.0f);
             lastBatteryUpdate = currentFrame;
         }
 
-        // Actualizar timer VAO cada segundo
+        // Actualizar timer VAO
         int elapsedTime = (int)(currentFrame - drone.startTime);
         int currentSecond = elapsedTime % 60;
         if (currentSecond != lastSecond) {
             if (timerVAO != 0) glDeleteVertexArrays(1, &timerVAO);
-
             int hours = elapsedTime / 3600;
             int mins = (elapsedTime % 3600) / 60;
             int secs = elapsedTime % 60;
@@ -500,7 +515,7 @@ int main() {
             lastSecond = currentSecond;
         }
 
-        // Actualizar baterÌa VAO cuando cambia
+        // Actualizar bater√≠a VAO
         static float lastBatteryPercent = 100.0f;
         if (drone.batteryPercent != lastBatteryPercent) {
             if (batteryVAO != 0) glDeleteVertexArrays(1, &batteryVAO);
@@ -511,9 +526,10 @@ int main() {
             batteryVAO = createBatteryVAO(drone.batteryPercent);
         }
 
+        // --- INPUT Y F√çSICAS ---
         processInput(window);
 
-        // Verificar distancia
+        // Verificar distancia (Signal Lost)
         float dist = glm::length(camera.Position - SPAWN_POINT);
         if (dist > MAX_DISTANCE) {
             if (!drone.signalLost) {
@@ -530,16 +546,19 @@ int main() {
             drone.signalLost = false;
         }
 
+        // --- RENDERIZADO ---
         glClearColor(0.01f, 0.01f, 0.02f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Renderizado 3D
+        // 1. Configuraci√≥n Global del Shader 3D
         lightingShader.use();
         lightingShader.setBool("thermalVision", drone.thermalVision);
+        lightingShader.setBool("isEmissive", false); // Por defecto apagado
         lightingShader.setMat4("projection", projection);
         lightingShader.setMat4("view", camera.GetViewMatrix());
         lightingShader.setVec3("viewPos", camera.Position);
 
+        // 2. Configuraci√≥n de Luces
         int numActive = std::min((int)lampPositions.size(), MAX_LIGHTS);
         float lightIntensity = drone.lightsOn ? 35.0f : 0.0f;
 
@@ -550,16 +569,63 @@ int main() {
         }
         glUniform1i(glGetUniformLocation(lightingShader.ID, "numLights"), numActive);
 
+        // 3. DIBUJAR LA LUNA (Peque√±a, lejana y brillante)
+        glm::mat4 moonModel = glm::mat4(1.0f);
+        // Posici√≥n: Alta y al fondo
+        moonModel = glm::translate(moonModel, glm::vec3(0.0f, 500.0f, -50.0f));
+        // Escala: Muy peque√±a para corregir el tama√±o gigante del OBJ original
+        moonModel = glm::scale(moonModel, glm::vec3(0.1f));
+        // Rotaci√≥n leve
+        moonModel = glm::rotate(moonModel, currentFrame * 0.02f, glm::vec3(0.0f, 1.0f, 0.0f));
+
+        lightingShader.setMat4("model", moonModel);
+
+        // ACTIVAMOS MODO EMISIVO (BRILLO)
+        lightingShader.setBool("isEmissive", true);
+        moon.Draw(lightingShader);
+        // DESACTIVAMOS INMEDIATAMENTE
+        lightingShader.setBool("isEmissive", false);
+
+        // 4. DIBUJAR CASA Y LUCES (Objetos normales)
         glm::mat4 model = glm::mat4(1.0f);
         lightingShader.setMat4("model", model);
         house.Draw(lightingShader);
         lightsModel.Draw(lightingShader);
 
+        // --- DIBUJAR CAMIONETA (VAN) ---
+        glm::mat4 vanMatrix = glm::mat4(1.0f);
+        lightingShader.setMat4("model", vanMatrix);
+        vanModel.Draw(lightingShader);
+
+        lightingShader.setMat4("model", vanMatrix);
+        vanModel.Draw(lightingShader);
+
+        // --- DIBUJAR FANTASMA 1 ---
+        glm::mat4 ghost1Matrix = glm::mat4(1.0f);
+		ghost1Matrix = glm::translate(ghost1Matrix, glm::vec3(0.0f, 0.5f, 0.0f));
+        ghost1Matrix = glm::translate(ghost1Matrix, glm::vec3(0.0f, sin(currentFrame * 1.5f) * 0.1f, 0.0f));
+        lightingShader.setMat4("model", ghost1Matrix);
+
+        // (Opcional) Si quieres que brille el fantasma, descomenta esto:
+        //lightingShader.setBool("isEmissive", true);
+        ghost1Model.Draw(lightingShader);
+        // lightingShader.setBool("isEmissive", false);
+
+        // --- DIBUJAR FANTASMA 2 ---
+        glm::mat4 ghost2Matrix = glm::mat4(1.0f);
+		ghost2Matrix = glm::translate(ghost2Matrix, glm::vec3(0.0f, 0.7f, 0.0f));
+        ghost2Matrix = glm::translate(ghost2Matrix, glm::vec3(0.0f, cos(currentFrame * 1.5f) * 0.1f, 0.0f));
+        lightingShader.setMat4("model", ghost2Matrix);
+
+        ghost2Model.Draw(lightingShader);
+        // -----------------------------
+
+        // 5. DIBUJAR NUBES
         model = glm::rotate(glm::mat4(1.0f), currentFrame * 0.01f, glm::vec3(0.0f, 1.0f, 0.0f));
         lightingShader.setMat4("model", model);
         clouds.Draw(lightingShader);
 
-        // HUD
+        // --- HUD (INTERFAZ 2D) ---
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -584,7 +650,7 @@ int main() {
         glBindVertexArray(frameQuadVAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        // Timer (esquina inferior derecha)
+        // Timer
         if (timerVAO != 0) {
             glUniform1i(locFrame, false);
             glUniform1i(locTimer, true);
@@ -593,7 +659,7 @@ int main() {
             glDrawArrays(GL_LINES, 0, 200);
         }
 
-        // BaterÌa (esquina superior izquierda)
+        // Bater√≠a
         if (batteryVAO != 0) {
             glUniform1i(locTimer, false);
             glUniform1i(locBattery, true);
@@ -602,7 +668,7 @@ int main() {
             glDrawArrays(GL_LINES, 0, 100);
         }
 
-        // Advertencia
+        // Advertencia (Signal Lost)
         if (drone.signalLost) {
             glUniform1i(locBattery, false);
             glUniform1f(locTime, currentFrame);
